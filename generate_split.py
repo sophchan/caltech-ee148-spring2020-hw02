@@ -1,14 +1,16 @@
 import numpy as np
 import os
+import json
 
 np.random.seed(2020) # to ensure you always get the same train/test split
 
 data_path = '../data/RedLights2011_Medium'
 gts_path = '../data/hw02_annotations'
 split_path = '../data/hw02_splits'
+preds_path = '../data/hw02_preds'
 os.makedirs(preds_path, exist_ok=True) # create directory if needed
 
-split_test = False # set to True and run when annotations are available
+split_test = True # set to True and run when annotations are available
 
 train_frac = 0.85
 
@@ -24,6 +26,10 @@ file_names_test = []
 '''
 Your code below. 
 '''
+test_num = np.int(len(file_names)*.15)
+file_names_test = np.random.choice(file_names, size=test_num, replace=False)
+file_names_train = [f for f in file_names if (f not in file_names_test) \
+    and ('.jpg') in f]
 
 assert (len(file_names_train) + len(file_names_test)) == len(file_names)
 assert len(np.intersect1d(file_names_train,file_names_test)) == 0
@@ -42,7 +48,12 @@ if split_test:
     '''
     Your code below. 
     '''
-    
+    for k in gts: 
+        if k in file_names_test:
+            gts_test[k] = gts[k]
+        else:
+            gts_train[k] = gts[k]
+
     with open(os.path.join(gts_path, 'annotations_train.json'),'w') as f:
         json.dump(gts_train,f)
     
